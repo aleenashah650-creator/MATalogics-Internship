@@ -1,0 +1,543 @@
+{
+  "name": "Airtable Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "authentication": "airtableTokenApi",
+        "baseId": {
+          "__rl": true,
+          "value": "https://airtable.com/appvPuhJF88GjqrDR/tblRa1J84zlffDcC3/viw193q6Nxder77si?blocks=hide",
+          "mode": "url"
+        },
+        "tableId": {
+          "__rl": true,
+          "value": "https://airtable.com/appvPuhJF88GjqrDR/tbl8jaFFTpIfayPcF/viwaD2ESVyHSDnkTO?blocks=hide",
+          "mode": "url"
+        },
+        "triggerField": "Created",
+        "additionalFields": {
+          "fields": "Lead Name,Source,Contact Number,Interested Service,Created"
+        }
+      },
+      "type": "n8n-nodes-base.airtableTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "52832ef5-6476-45be-acd2-26a211333cb3",
+      "name": "Airtable Trigger",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "crczCTRxdd8fLXF8",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0BPFVAD1CN",
+          "mode": "list",
+          "cachedResultName": "lead-notifications"
+        },
+        "text": "=🚨 New Lead Received!\n\nName: {{$json.fields[\"Lead Name\"]}}\nSource: {{$json.fields[\"Source\"]}}\nContact: {{$json.fields[\"Contact Number\"]}}\nInterested Service: {{$json.fields[\"Interested Service\"]}}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "286e9b16-0bb2-4ad7-bdf2-67398275bdea",
+      "name": "Send a message",
+      "webhookId": "8c4b1040-5a74-49dd-8b90-2135b71a6462",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "KREqIf6ACl4huizH",
+          "name": "Slack account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "authentication": "airtableTokenApi",
+        "baseId": {
+          "__rl": true,
+          "value": "https://airtable.com/appvPuhJF88GjqrDR/tblRa1J84zlffDcC3/viw193q6Nxder77si?blocks=hide",
+          "mode": "url"
+        },
+        "tableId": {
+          "__rl": true,
+          "value": "https://airtable.com/appvPuhJF88GjqrDR/tblRa1J84zlffDcC3/viw193q6Nxder77si?blocks=hide",
+          "mode": "url"
+        },
+        "triggerField": "Created",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.airtableTrigger",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        192
+      ],
+      "id": "08f68285-5a8d-4ac0-9074-c08e65e15b70",
+      "name": "Airtable Trigger1",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "crczCTRxdd8fLXF8",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const clientId = \"CL-\" + Date.now();\n\nreturn [\n  {\n    json: {\n      ...$json,\n      clientId: clientId\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        176,
+        192
+      ],
+      "id": "76990ad7-c45f-4c9f-82b4-2f50f25378f5",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0BQCEN7BMW",
+          "mode": "list",
+          "cachedResultName": "client-notifications"
+        },
+        "text": "=🎉 New Client Added!\n\nClient ID: {{$json.clientId}}\nName: {{$json.fields[\"Name\"]}}\nCompany: {{$json.fields[\"Company\"]}}\nEmail: {{$json.fields[\"Email\"]}}\nStatus: {{$json.fields[\"Status\"]}}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.5,
+      "position": [
+        400,
+        192
+      ],
+      "id": "fc5b8443-3507-48b4-b60e-b97c633a89a8",
+      "name": "Send a message1",
+      "webhookId": "f6dce5ca-b9dc-4764-b125-5adecb7cf021",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "KREqIf6ACl4huizH",
+          "name": "Slack account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "authentication": "airtableTokenApi",
+        "baseId": {
+          "__rl": true,
+          "value": "https://airtable.com/appvPuhJF88GjqrDR/tblRa1J84zlffDcC3/viw193q6Nxder77si?blocks=hide",
+          "mode": "url"
+        },
+        "tableId": {
+          "__rl": true,
+          "value": "https://airtable.com/appvPuhJF88GjqrDR/tblM8qBnQXatpFHso/viwe9a6c2s1j95iBJ?blocks=hide",
+          "mode": "url"
+        },
+        "triggerField": "Created",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.airtableTrigger",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        384
+      ],
+      "id": "ced4e2e3-ebca-4aed-b57f-00f61262daab",
+      "name": "Airtable Trigger2",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "crczCTRxdd8fLXF8",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "aleenashah650@gmail.com",
+        "subject": "=Project Status Updated - {{$json.fields[\"Project Name\"]}}",
+        "message": "=Hello,  The project status has been updated.  \n\nProject: {{$json.fields[\"Project Name\"]}}\n\nAssigned To: {{$json.fields[\"Assigned To\"]}}\n\nDeadline: {{$json.fields[\"Deadline\"]}}\n\nNew Status: {{$json.fields[\"Status\"]}} \n\nRegards, MATalogics Automation",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        176,
+        384
+      ],
+      "id": "c7facda8-852b-4f9e-a26b-1a25f91fdd57",
+      "name": "Send a message2",
+      "webhookId": "3b42b4e3-5481-4043-b9ac-eaca7a03476a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "v51W5YYHfJ4axU1G",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "authentication": "airtableTokenApi",
+        "baseId": {
+          "__rl": true,
+          "value": "https://airtable.com/appvPuhJF88GjqrDR/tblRa1J84zlffDcC3/viw193q6Nxder77si?blocks=hide",
+          "mode": "url"
+        },
+        "tableId": {
+          "__rl": true,
+          "value": "https://airtable.com/appvPuhJF88GjqrDR/tblCxnUdGgBfVmF2J/viwxhRxOKvda2qnna?blocks=hide",
+          "mode": "url"
+        },
+        "triggerField": "Created",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.airtableTrigger",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        560
+      ],
+      "id": "6a528254-15dc-42a7-9475-1129843b000c",
+      "name": "Airtable Trigger3",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "crczCTRxdd8fLXF8",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0BPGC0MR7Y",
+          "mode": "list",
+          "cachedResultName": "operations-notifications"
+        },
+        "text": "=🤖 AI Agent Status Updated!\n\nAgent Name: {{$json.fields[\"Agent Name\"]}}\nType: {{$json.fields[\"Type\"]}}\nDeployment Status: {{$json.fields[\"Deployment Status\"]}}\nLast Updated: {{$json.fields[\"Last Updated\"]}}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.5,
+      "position": [
+        176,
+        560
+      ],
+      "id": "8863a0f1-84f8-4025-a941-6d3d24239bba",
+      "name": "Send a message3",
+      "webhookId": "df337b8d-899d-4bf5-85bd-c4a8d5ffa16d",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "KREqIf6ACl4huizH",
+          "name": "Slack account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "authentication": "airtableTokenApi",
+        "baseId": {
+          "__rl": true,
+          "value": "https://airtable.com/appvPuhJF88GjqrDR/tblRa1J84zlffDcC3/viw193q6Nxder77si?blocks=hide",
+          "mode": "url"
+        },
+        "tableId": {
+          "__rl": true,
+          "value": "https://airtable.com/appvPuhJF88GjqrDR/tblgpCKtFR2ROowdV/viwQkHLATTQFTeluY?blocks=hide",
+          "mode": "url"
+        },
+        "triggerField": "Created",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.airtableTrigger",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        752
+      ],
+      "id": "3ab89f35-82ea-4f51-8dd4-a4ea694cec4a",
+      "name": "Airtable Trigger4",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "crczCTRxdd8fLXF8",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const taskCount = $json.fields[\"Task Count\"];\nconst currentScore = $json.fields[\"Performance Score\"];\n\n// Increase performance score by 5 points for a completed task\nconst newScore = currentScore + 5;\n\nreturn [\n  {\n    json: {\n      ...$json,\n      newScore: newScore\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        176,
+        752
+      ],
+      "id": "5b1a02a6-ab0f-417b-8906-65efb967ea24",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appvPuhJF88GjqrDR",
+          "mode": "list",
+          "cachedResultName": "MATalogics AI Operation Base",
+          "cachedResultUrl": "https://airtable.com/appvPuhJF88GjqrDR"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblgpCKtFR2ROowdV",
+          "mode": "list",
+          "cachedResultName": "Interns",
+          "cachedResultUrl": "https://airtable.com/appvPuhJF88GjqrDR/tblgpCKtFR2ROowdV"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "Intern Name": "={{ $json.fields['Intern Name'] }}",
+            "Department": "={{ $json.fields.Department }}",
+            "Task Count": "={{ $json.fields['Task Count'] }}",
+            "Performance Score": "={{$json.newScore}}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Intern Name",
+              "displayName": "Intern Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Department",
+              "displayName": "Department",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Task Count",
+              "displayName": "Task Count",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Performance Score",
+              "displayName": "Performance Score",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Created",
+              "displayName": "Created",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        400,
+        752
+      ],
+      "id": "6b1ed96b-59cc-4b9b-9587-db5041f030a9",
+      "name": "Update record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "crczCTRxdd8fLXF8",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Airtable Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable Trigger2": {
+      "main": [
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable Trigger3": {
+      "main": [
+        [
+          {
+            "node": "Send a message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable Trigger4": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Update record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "c814242c-563d-413a-97cd-d7f1f194de41",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a45a444a6564d567d7461cdae665ca1a4b863fe81513fcc1c1d6a2502da8c9a2"
+  },
+  "nodeGroups": [],
+  "id": "o933aMj8OGeW4hjQ",
+  "tags": []
+}

@@ -1,0 +1,436 @@
+{
+  "name": "VAPI+AIRTABLE+NOTION",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "602ec7bb-ba82-4441-9817-f96d8c71bccd",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -288,
+        0
+      ],
+      "id": "27964e9d-006a-4476-8751-0a984f1f936c",
+      "name": "Webhook",
+      "webhookId": "602ec7bb-ba82-4441-9817-f96d8c71bccd"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze the following client onboarding information received from the Vapi Client Onboarding Agent.\n\nClient data:\n{{ $json.client_data }}\nGenerate:\n1. Service Category\n2. Lead Priority\n3. Short Summary\n4. Recommended Next Action\n\nPriority rules:\n- Budget >= 500,000 PKR = HIGH\n- Budget 200,000–499,999 PKR = MEDIUM\n- Budget < 200,000 PKR = LOW\n\nReturn only valid JSON:\n{\n  \"service_category\": \"\",\n  \"lead_priority\": \"\",\n  \"short_summary\": \"\",\n  \"recommended_next_action\": \"\"\n}",
+        "options": {
+          "systemMessage": "You are the AI Processing stage of a Client Onboarding workflow.\n\nYour job is to analyze the client information received from the Vapi Client Onboarding Agent and generate exactly four outputs:\n\n1. Service Category\n2. Lead Priority\n3. Short Summary\n4. Recommended Next Action\n\nThe client information may contain:\n- Client Name\n- Company Name\n- Email\n- Service Required\n- Project Description\n- Budget\n\nDo not invent or change any information provided by the client.\n\nSERVICE CATEGORY:\nDetermine the most appropriate category based on the service requested.\n\nUse a clear, concise category such as:\n- Website Development\n- Mobile App Development\n- AI Automation\n- AI Agent\n- Voice AI\n- Digital Marketing\n- Software Development\n- Web & Mobile Development\n- Other\n\nChoose the category that best matches the client's actual requirement.\nDo not create unnecessary categories.\n\nLEAD PRIORITY:\nDetermine the priority using the client's stated budget.\n\nUse these exact rules:\n- Budget >= 500,000 PKR = HIGH\n- Budget from 200,000 PKR to 499,999 PKR = MEDIUM\n- Budget < 200,000 PKR = LOW\n\nIf the budget is stated in PKR, apply the rules directly.\nIf the client gives an approximate amount such as \"around 500,000 PKR\", use the stated approximate amount.\nDo not invent a budget.\n\nSHORT SUMMARY:\nCreate a concise summary of the client's request.\nInclude:\n- What the client/company needs\n- The main service required\n- The main project requirement\n- The stated budget when available\n\nKeep the summary professional and brief.\nDo not add information that the client did not provide.\n\nRECOMMENDED NEXT ACTION:\nRecommend one practical next step based on the client's requirement and priority.\n\nExamples:\n- Schedule a discovery call\n- Contact the client to discuss project requirements\n- Send a proposal\n- Arrange a consultation\n- Follow up with the client\n- Review requirements and prepare a quotation\n\nChoose the most appropriate next action for the specific lead.\nDo not invent details such as dates, meeting times, prices, or team members.\n\nIMPORTANT:\n- Preserve the client's information accurately.\n- Do not modify the client's budget.\n- Do not invent missing information.\n- Do not generate a priority different from the stated budget rules.\n- Keep all four outputs concise and professional.\n\nReturn ONLY valid JSON in exactly this structure:\n\n{\n  \"service_category\": \"\",\n  \"lead_priority\": \"\",\n  \"short_summary\": \"\",\n  \"recommended_next_action\": \"\"\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        160,
+        0
+      ],
+      "id": "e4872907-45a7-457a-abad-19ad3c662dad",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "dcaeef18-a371-4550-ac68-a6f5863b267f",
+              "name": "client_data",
+              "value": "={{ Object.entries($json.body.message.toolCalls[0].function).find(([key]) => key === 'arguments')?.[1] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -64,
+        0
+      ],
+      "id": "52526191-6f17-40df-bdf3-af81bc908c91",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appCw2iNpEwkcXkS8",
+          "mode": "list",
+          "cachedResultName": "Client Onboarding CRM Base",
+          "cachedResultUrl": "https://airtable.com/appCw2iNpEwkcXkS8"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblAwPS9336cSTh1H",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/appCw2iNpEwkcXkS8/tblAwPS9336cSTh1H"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Budget": "Around 100,000 PKR",
+            "Lead Priority": "LOW",
+            "Client Name": "Ahmed",
+            "Company Name": "Bright Solutions",
+            "Email": "ahmed@brightsolutions.com",
+            "Service": "Website Development",
+            "Description": "Simple business website with information about the company and services.",
+            "Service Category": "Website Development",
+            "Short Summary": "Ahmed from Bright Solutions requires a simple business website to display company information and services, with a stated budget of 100,000 PKR.",
+            "Recommended Next Action": "Contact the client (Ahmed) to discuss project requirements.  "
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Client Name",
+              "displayName": "Client Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Service",
+              "displayName": "Service",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Service Category",
+              "displayName": "Service Category",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Lead Priority",
+              "displayName": "Lead Priority",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "HIGH",
+                  "value": "HIGH"
+                },
+                {
+                  "name": "MEDIUM",
+                  "value": "MEDIUM"
+                },
+                {
+                  "name": "LOW",
+                  "value": "LOW"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Short Summary",
+              "displayName": "Short Summary",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Recommended Next Action",
+              "displayName": "Recommended Next Action",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Created",
+              "displayName": "Created",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        528,
+        0
+      ],
+      "id": "2c2668b3-ed78-4cb5-9435-310dc4685acd",
+      "name": "Create a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "BVkPk9UAQy3Sw7GO",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "dataSourceId": {
+          "__rl": true,
+          "value": "3b852f2a-f82d-80ba-aac4-000ba03320b8",
+          "mode": "list",
+          "cachedResultName": "Tasks",
+          "cachedResultUrl": "https://app.notion.com/p/3b852f2af82d806eb515c068ac88ec15"
+        },
+        "title": "Onboarding Client low",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Name|title",
+              "title": "={{ $json.fields['Client Name'] }}"
+            },
+            {
+              "key": "Company|rich_text",
+              "textContent": "={{ $json.fields['Company Name'] }}"
+            },
+            {
+              "key": "Priority|select",
+              "selectValue": "={{ $json.fields['Lead Priority'] }}"
+            },
+            {
+              "key": "Service|rich_text",
+              "textContent": "={{ $json.fields.Service }}"
+            },
+            {
+              "key": "Status|select",
+              "selectValue": "New"
+            },
+            {
+              "key": "Summary|rich_text",
+              "textContent": "={{ $json.fields['Short Summary'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 3,
+      "position": [
+        752,
+        0
+      ],
+      "id": "88cc665a-02e6-4769-8ee8-0c62720384ff",
+      "name": "Create a database page",
+      "credentials": {
+        "notionApi": {
+          "id": "Y3DtyAMCsN7bhjTI",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0BQ35D1CPL",
+          "mode": "list",
+          "cachedResultName": "new-leads"
+        },
+        "text": "=🚨 New Client Lead\nClient: {{ $('Create a record').item.json.fields['Client Name'] }}\nCompany:{{ $json.property_company }}\nService: {{ $json.property_service }}\nBudget: {{ $('Create a record').item.json.fields.Budget }}\nPriority: {{ $json.property_priority }}\nSummary: {{ $json.property_summary }}\nNext Action: {{ $('Create a record').item.json.fields['Recommended Next Action'] }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.5,
+      "position": [
+        976,
+        0
+      ],
+      "id": "b7ee0486-f496-427b-acaf-1a32f80221e0",
+      "name": "Send a message",
+      "webhookId": "66165374-d127-41d9-936c-9d509b4e0a20",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "KREqIf6ACl4huizH",
+          "name": "Slack account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        32,
+        208
+      ],
+      "id": "2667ab5d-544b-4591-96d2-0ce9a5ca2cc3",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "E4I2zmDVTheEh99Y",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Create a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a record": {
+      "main": [
+        [
+          {
+            "node": "Create a database page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a database page": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "f4bd3339-5bb8-4d3a-ad71-8b71175eaaea",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a45a444a6564d567d7461cdae665ca1a4b863fe81513fcc1c1d6a2502da8c9a2"
+  },
+  "nodeGroups": [],
+  "id": "wvogxB429lAy5zXX",
+  "tags": []
+}

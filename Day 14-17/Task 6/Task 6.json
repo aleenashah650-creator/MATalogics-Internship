@@ -1,0 +1,368 @@
+{
+  "name": "Task 6",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ai-lead-qualification",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "245d4138-e374-4ca8-bcf9-5c06da72c973",
+      "name": "Webhook",
+      "webhookId": "c0d18de2-1ba5-4775-9f42-d6c28783a5f4"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze the following lead and qualify it.\n\nLead Name: {{ $json.body.name }}\nEmail: {{ $json.body.email }}\nPhone: {{ $json.body.phone }}\nCompany: {{ $json.body.company }}\nMessage: {{ $json.body.message }}\nSource: {{ $json.body.source }}\n\nDetermine:\n1. Lead score from 0 to 100\n2. Lead status\n3. Lead category\n\nReturn ONLY valid JSON in this exact format:\n{\n  \"lead_score\": 0,\n  \"status\": \"\",\n  \"category\": \"\"\n}",
+        "options": {
+          "systemMessage": "You are an AI Lead Qualification Agent.\n\nYour job is to analyze incoming lead information and determine:\n\n1. Lead score from 0 to 100\n2. Lead status\n3. Lead category\n\nEvaluate the lead based on the information provided, especially the company, message, source, and apparent level of interest.\n\nReturn ONLY valid JSON in this exact format:\n\n{\n  \"lead_score\": 0,\n  \"status\": \"\",\n  \"category\": \"\"\n}\n\nDo not include explanations, markdown, or any text outside the JSON."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "85bb3d7e-c419-4e55-9b95-e327d518bd41",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5-nano",
+          "mode": "list",
+          "cachedResultName": "gpt-5-nano"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        96,
+        208
+      ],
+      "id": "08b04310-5b65-40e5-9135-b8b268b87cd4",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "OSm06YgeDZQWS1lF",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "leads",
+          "mode": "list",
+          "cachedResultName": "leads"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ $('Webhook').item.json.body.name }}",
+            "email": "={{ $('Webhook').item.json.body.email }}",
+            "phone": "={{ $('Webhook').item.json.body.phone }}",
+            "company": "={{ $('Webhook').item.json.body.company }}",
+            "message": "={{ $('Webhook').item.json.body.message }}",
+            "source": "={{ $('Webhook').item.json.body.source }}",
+            "lead_score": "={{ $json.lead_score }}",
+            "status": "={{ $json.status }}",
+            "category": "={{ $json.category }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "company",
+              "displayName": "company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "lead_score",
+              "displayName": "lead_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        736,
+        0
+      ],
+      "id": "92ecb309-e7ac-4103-a8d9-0b64b36e2e32",
+      "name": "Insert rows in a table",
+      "credentials": {
+        "postgres": {
+          "id": "KvDlWnrxEQYCJUMn",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const aiResult = JSON.parse($json.output);\n\nreturn {\n  json: {\n    ...aiResult\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        512,
+        0
+      ],
+      "id": "5aca6415-d3a4-48b3-b972-0946fd22e0fe",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "tableId": "leads",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $json.name }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $json.email }}"
+            },
+            {
+              "fieldId": "phone",
+              "fieldValue": "={{ $json.phone }}"
+            },
+            {
+              "fieldId": "company",
+              "fieldValue": "={{ $json.company }}"
+            },
+            {
+              "fieldId": "message",
+              "fieldValue": "={{ $json.message }}"
+            },
+            {
+              "fieldId": "source",
+              "fieldValue": "={{ $json.source }}"
+            },
+            {
+              "fieldId": "lead_score",
+              "fieldValue": "={{ $json.lead_score }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "={{ $json.status }}"
+            },
+            {
+              "fieldId": "category",
+              "fieldValue": "={{ $json.category }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        960,
+        0
+      ],
+      "id": "9a54427a-3c33-4398-8e74-5faa7e080caa",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "lB8v1w7l1MQeobNo",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert rows in a table": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "d2f0960b-0240-4be6-8780-08393b7e3461",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ebbf39d0764128079d716133dd1fa61dec8e9c491bec9f0adbe7c4bd51fa41cd"
+  },
+  "nodeGroups": [],
+  "id": "cSaiI21w6EY4etmC",
+  "tags": []
+}

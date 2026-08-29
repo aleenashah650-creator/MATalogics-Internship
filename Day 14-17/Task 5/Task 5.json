@@ -1,0 +1,332 @@
+{
+  "name": "Task 5",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead-capture",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "22e4bc85-bf50-4f1d-a0f8-56fc7022a2ff",
+      "name": "Webhook",
+      "webhookId": "4bb1330a-ef8f-4115-b7d1-4b45ed637a30"
+    },
+    {
+      "parameters": {
+        "jsCode": "const lead = $json.body;\n\nconst requiredFields = [\n  'name',\n  'email',\n  'phone',\n  'company',\n  'message',\n  'source'\n];\n\nconst missingFields = requiredFields.filter(\n  field => !lead[field] || String(lead[field]).trim() === ''\n);\n\nif (missingFields.length > 0) {\n  return [\n    {\n      json: {\n        valid: false,\n        error: `Missing required fields: ${missingFields.join(', ')}`\n      }\n    }\n  ];\n}\n\nreturn [\n  {\n    json: {\n      valid: true,\n      ...lead\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "e3856942-dab9-4610-8852-83fdfb1a7192",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "leads",
+          "mode": "list",
+          "cachedResultName": "leads"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": 0,
+            "lead_score": 0,
+            "name": "={{ $json.name }}",
+            "email": "={{ $json.email }}",
+            "phone": "={{ $json.phone }}",
+            "company": "={{ $json.company }}",
+            "message": "={{ $json.message }}",
+            "source": "={{ $json.source }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "company",
+              "displayName": "company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "lead_score",
+              "displayName": "lead_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        448,
+        0
+      ],
+      "id": "1505bb21-d4e1-4f8c-aadc-b8d87f753560",
+      "name": "Insert rows in a table",
+      "credentials": {
+        "postgres": {
+          "id": "KvDlWnrxEQYCJUMn",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "leads",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $json.name }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $json.email }}"
+            },
+            {
+              "fieldId": "phone",
+              "fieldValue": "={{ $json.phone }}"
+            },
+            {
+              "fieldId": "company",
+              "fieldValue": "={{ $json.company }}"
+            },
+            {
+              "fieldId": "message",
+              "fieldValue": "={{ $json.message }}"
+            },
+            {
+              "fieldId": "source",
+              "fieldValue": "={{ $json.source }}"
+            },
+            {
+              "fieldId": "lead_score",
+              "fieldValue": "={{ $json.lead_score }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "=new"
+            },
+            {
+              "fieldId": "created_at",
+              "fieldValue": "={{ $json.created_at }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        672,
+        0
+      ],
+      "id": "21e491bf-d26f-4e70-8e1d-9900d0ac93eb",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "lB8v1w7l1MQeobNo",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "aleeeeenashah.app.n8n.cloud",
+            "user-agent": "PostmanRuntime/7.56.1",
+            "content-length": "204",
+            "accept": "*/*",
+            "accept-encoding": "gzip, br",
+            "cache-control": "no-cache",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "32.197.83.155",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "US",
+            "cf-ray": "a3262d985af88062-IAD",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "postman-token": "f9047151-6837-4601-84be-ccb10620dc0a",
+            "x-forwarded-for": "32.197.83.155, 162.158.152.191",
+            "x-forwarded-host": "aleeeeenashah.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-96-786656fcc6-9rdnf",
+            "x-is-trusted": "yes",
+            "x-real-ip": "32.197.83.155"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "name": "Ahmed Khan",
+            "email": "ahmed@gmail.com",
+            "phone": "+923001111111",
+            "company": "Tech Solutions",
+            "message": "I am interested in AI automation services.",
+            "source": "Website"
+          },
+          "webhookUrl": "https://aleeeeenashah.app.n8n.cloud/webhook-test/lead-capture",
+          "executionMode": "test"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert rows in a table": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "3015bb45-d81e-4bbe-a9f1-198f187840b9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ebbf39d0764128079d716133dd1fa61dec8e9c491bec9f0adbe7c4bd51fa41cd"
+  },
+  "nodeGroups": [],
+  "id": "7hFWNy5f3gVSXmNn",
+  "tags": []
+}

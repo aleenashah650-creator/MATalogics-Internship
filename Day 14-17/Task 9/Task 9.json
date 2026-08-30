@@ -1,0 +1,220 @@
+{
+  "name": "Task 9",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f18855fd-94b0-459c-bb29-677b667264ec",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n    id,\n    name,\n    email,\n    company,\n    source,\n    lead_score,\n    status,\n    created_at\nFROM leads\nORDER BY created_at DESC;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.7,
+      "position": [
+        224,
+        0
+      ],
+      "id": "eedfca75-cba2-4306-949b-4b84bc048b9e",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "KvDlWnrxEQYCJUMn",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "leads",
+        "limit": 5,
+        "orderBy": "created_at.desc"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        448,
+        0
+      ],
+      "id": "9e4621d9-c734-431b-a49e-8de5040e8b3f",
+      "name": "Get many rows",
+      "credentials": {
+        "supabaseApi": {
+          "id": "lB8v1w7l1MQeobNo",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const leads = $input.all().map(item => item.json);\n\nconst totalLeads = leads.length;\n\nconst newLeads = leads.filter(\n  lead => String(lead.status || '').toLowerCase() === 'new'\n    || String(lead.status || '').toLowerCase() === 'new lead'\n).length;\n\nconst qualifiedLeads = leads.filter(\n  lead => String(lead.status || '').toLowerCase() === 'qualified'\n).length;\n\nconst convertedLeads = leads.filter(\n  lead => String(lead.status || '').toLowerCase() === 'converted'\n).length;\n\nconst scores = leads\n  .map(lead => Number(lead.lead_score))\n  .filter(score => !isNaN(score));\n\nconst averageLeadScore = scores.length\n  ? scores.reduce((sum, score) => sum + score, 0) / scores.length\n  : 0;\n\n// Find top lead source\nconst sourceCounts = {};\n\nleads.forEach(lead => {\n  const source = lead.source || 'Unknown';\n  sourceCounts[source] = (sourceCounts[source] || 0) + 1;\n});\n\nconst topLeadSource = Object.entries(sourceCounts)\n  .sort((a, b) => b[1] - a[1])[0] || ['Unknown', 0];\n\n// Top 5 leads\nconst top5Leads = [...leads]\n  .sort((a, b) => Number(b.lead_score || 0) - Number(a.lead_score || 0))\n  .slice(0, 5)\n  .map(lead => ({\n    name: lead.name,\n    company: lead.company,\n    lead_score: Number(lead.lead_score || 0),\n    status: lead.status,\n    source: lead.source\n  }));\n\n// Conversion rate\nconst conversionRate = totalLeads\n  ? (convertedLeads / totalLeads) * 100\n  : 0;\n\nreturn [\n  {\n    json: {\n      totalLeads,\n      newLeads,\n      qualifiedLeads,\n      convertedLeads,\n      averageLeadScore: Number(averageLeadScore.toFixed(2)),\n      topLeadSource: topLeadSource[0],\n      topLeadSourceCount: topLeadSource[1],\n      top5Leads,\n      conversionRate: Number(conversionRate.toFixed(2))\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        0
+      ],
+      "id": "c109f15b-6709-4797-94df-f83c50c40d08",
+      "name": "Calculate Metrics"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ JSON.stringify($json) }}",
+        "options": {
+          "systemMessage": "You are a business reporting assistant.\n\nUsing ONLY the calculated metrics provided in the input, generate a professional Daily Lead Report.\n\nFollow this EXACT format:\n\nDAILY LEAD REPORT\n\nKEY METRICS\nTotal Leads: [value]\nNew Leads: [value]\nQualified Leads: [value]\nConverted Leads: [value]\nAverage Lead Score: [value]\nTop Lead Source: [source] ([count] leads)\nConversion Rate: [value]%\n\nTOP 5 LEADS\n1. Name — Company — Lead Score — Source\n2. Name — Company — Lead Score — Source\n3. Name — Company — Lead Score — Source\n4. Name — Company — Lead Score — Source\n5. Name — Company — Lead Score — Source\n\nBUSINESS SUMMARY\n[Write a short 2–3 sentence summary based only on the provided metrics.]\n\nIMPORTANT:\n- Keep the exact headings shown above.\n- Do not use Markdown symbols such as #, **, or bullet points.\n- Do not add information that is not provided.\n- Do not invent statistics.\n- Keep the report concise and professional.\n- Return only the report."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        896,
+        0
+      ],
+      "id": "ffcb25b1-f697-4045-8582-845af07173a3",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        768,
+        208
+      ],
+      "id": "be43a1ae-2e7e-4131-bb2c-63a8cf987445",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "jdRaB9ZN3SqfpUOl",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "aleenashah650@gmail.com",
+        "subject": "Daily Lead Performance Report",
+        "emailType": "text",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1264,
+        0
+      ],
+      "id": "b21aed62-1d5e-40e4-aadd-1b6c8e7ce357",
+      "name": "Send a message",
+      "webhookId": "9d01de85-208a-4e0e-973d-0410bcd6d3af",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "lO3oqWUNvmcUtT2o",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Get many rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many rows": {
+      "main": [
+        [
+          {
+            "node": "Calculate Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Metrics": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "c5849ba9-c1f0-4ed5-92c8-f4829ac6ddc9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ebbf39d0764128079d716133dd1fa61dec8e9c491bec9f0adbe7c4bd51fa41cd"
+  },
+  "nodeGroups": [],
+  "id": "T1ifmtvVejXai0pN",
+  "tags": []
+}

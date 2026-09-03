@@ -1,0 +1,96 @@
+{
+  "name": "UrbanCart Notion Support Log",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "9efcdca8-fe15-4b0d-9247-e17d5810af92",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "databasePage",
+        "dataSourceId": {
+          "__rl": true,
+          "value": "3b852f2a-f82d-80ba-aac4-000ba03320b8",
+          "mode": "list",
+          "cachedResultName": "Tasks",
+          "cachedResultUrl": "https://app.notion.com/p/3b852f2af82d806eb515c068ac88ec15"
+        },
+        "title": "UrbanCart Support Guidelines",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Priority |select",
+              "selectValue": "High"
+            },
+            {
+              "key": "AI Response|rich_text",
+              "textContent": "Use the UrbanCart knowledge base for product and policy questions. Escalate serious complaints to human support."
+            },
+            {
+              "key": "Customer Complaint|rich_text",
+              "textContent": "Serious complaints involving damaged products, complicated refunds, or angry customers must be escalated to human support."
+            },
+            {
+              "key": "Status|select",
+              "selectValue": "Open"
+            },
+            {
+              "key": "Issue|rich_text",
+              "textContent": "UrbanCart Customer Support & Escalation Guidelines"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 3,
+      "position": [
+        224,
+        0
+      ],
+      "id": "8d945031-ea6e-403f-8bcd-732e8fc569eb",
+      "name": "Create a database page",
+      "credentials": {
+        "notionOAuth2Api": {
+          "id": "Z4unG2jzxvkX5xy1",
+          "name": "Notion account 4"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Create a database page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "497eb19b-2026-4251-83be-ecd55c9c38d8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ebbf39d0764128079d716133dd1fa61dec8e9c491bec9f0adbe7c4bd51fa41cd"
+  },
+  "nodeGroups": [],
+  "id": "BMoDUgE2zHluPfSe",
+  "tags": []
+}

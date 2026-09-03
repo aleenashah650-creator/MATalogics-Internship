@@ -1,0 +1,283 @@
+{
+  "name": "UrbanCart Lead Capture",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "cbe2d98c-e9a6-4dad-a1f3-50d2fbd2b0bf",
+      "name": "When chat message received",
+      "webhookId": "14fc5d3d-b3b3-45e9-932d-99f4de41c502"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are UrbanCart's lead capture assistant.\n\nIdentify customers who show purchase interest and collect these details:\n- Name\n- Phone number\n- Product they are interested in\n- Approximate budget\n- Location\n- Purchase readiness\n\nAsk for any missing information before creating a lead record.\n\nReturn the collected information in a clear structured format.\nDo not invent missing information."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "8b3ad2f5-dce0-4eb1-8138-6fd423a39001",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        192,
+        176
+      ],
+      "id": "ae0eb87c-7796-4b2d-8c12-31f0be7dfd03",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "jdRaB9ZN3SqfpUOl",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appCw2iNpEwkcXkS8",
+          "mode": "list",
+          "cachedResultName": "Client Onboarding CRM Base",
+          "cachedResultUrl": "https://airtable.com/appCw2iNpEwkcXkS8"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblLcyLlSuj9WtECs",
+          "mode": "list",
+          "cachedResultName": "UrbanCart Leads",
+          "cachedResultUrl": "https://airtable.com/appCw2iNpEwkcXkS8/tblLcyLlSuj9WtECs"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.name }}",
+            "Phone": "={{ $json.phone }}",
+            "Product": "={{ $json.product }}",
+            "Budget": "={{ $json.budget }}",
+            "Location": "={{ $json.location }}",
+            "Purchase Readiness": "={{ $json.purchase_readiness }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Product",
+              "displayName": "Product",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Location",
+              "displayName": "Location",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Purchase Readiness",
+              "displayName": "Purchase Readiness",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        800,
+        0
+      ],
+      "id": "2d0a6cea-e2c0-44c2-9c66-00576194b48f",
+      "name": "Create a record",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "ovCPS0u2qsMiIypX",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = $json.output;\n\nconst extract = (label) => {\n  const regex = new RegExp(\n    `\\\\*\\\\*${label}:\\\\*\\\\*\\\\s*(.+?)(?:\\\\n|$)`,\n    'i'\n  );\n  return output.match(regex)?.[1]?.trim() || '';\n};\n\nreturn [\n  {\n    json: {\n      name: extract('Name'),\n      phone: extract('Phone Number'),\n      product: extract('Product'),\n      budget: extract('Approximate Budget'),\n      location: extract('Location'),\n      purchase_readiness: extract('Purchase Readiness')\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        576,
+        0
+      ],
+      "id": "7eed108a-df61-4ba3-953e-c37542c33d81",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0BU5BNMMCN",
+          "mode": "list",
+          "cachedResultName": "urbancart-sales-lead"
+        },
+        "text": "=🚨 NEW URBANCART LEAD \nName:  {{ $('Code in JavaScript').item.json.name }}\nPhone: {{ $('Code in JavaScript').item.json.phone }}\nProduct: {{ $('Code in JavaScript').item.json.product }}\nBudget: {{ $('Code in JavaScript').item.json.budget }} \nLocation: {{ $('Code in JavaScript').item.json.location }}\nPurchase Readiness: {{ $('Code in JavaScript').item.json.purchase_readiness }}\nPlease follow up with this lead.",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.7,
+      "position": [
+        1024,
+        0
+      ],
+      "id": "800201b3-0248-49ac-9abd-3cadd2ade15d",
+      "name": "Send a message",
+      "webhookId": "a573a596-d274-4a32-9dd7-1ede6a3f2a43",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "YtwTkCyMfDWVW0n0",
+          "name": "Slack account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Create a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a record": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "14b83117-7799-4412-be2a-45cfd97e4f57",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ebbf39d0764128079d716133dd1fa61dec8e9c491bec9f0adbe7c4bd51fa41cd"
+  },
+  "nodeGroups": [],
+  "id": "PkNMW7t7rgFzNrkE",
+  "tags": []
+}

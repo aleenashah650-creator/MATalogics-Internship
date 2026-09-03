@@ -1,0 +1,127 @@
+{
+  "name": "Order Lookup Urban",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "cbac58bb-3328-44cb-ba1c-e87852c62cbe",
+      "name": "When chat message received",
+      "webhookId": "52074660-95d2-4826-b0f4-f432b790756a"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are the UrbanCart customer support assistant.\n\nHelp customers look up their order information using the available business database.\n\nDo not invent order information. If the requested order cannot be found, clearly tell the customer that the order could not be located and that human assistance may be required."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "4c420f05-ecfa-4911-837b-e3694e507b86",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        96,
+        208
+      ],
+      "id": "38751046-7e68-4082-900d-c24bd2fa5183",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "jdRaB9ZN3SqfpUOl",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Look up customer order information by order number. ",
+        "operation": "executeQuery",
+        "query": "SELECT *\nFROM urbancart_orders\nWHERE order_id = $1;",
+        "options": {
+          "queryReplacement": " UC1001"
+        }
+      },
+      "type": "n8n-nodes-base.postgresTool",
+      "typeVersion": 2.7,
+      "position": [
+        464,
+        192
+      ],
+      "id": "e902fea5-8e33-4cdb-b1fb-ba9da5b8d308",
+      "name": "Execute a SQL query in Postgres",
+      "credentials": {
+        "postgres": {
+          "id": "KvDlWnrxEQYCJUMn",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query in Postgres": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "8fc74353-9995-4fb7-b299-ef485a1a79d0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ebbf39d0764128079d716133dd1fa61dec8e9c491bec9f0adbe7c4bd51fa41cd"
+  },
+  "nodeGroups": [],
+  "id": "Zm0MJsQd5D80DG5M",
+  "tags": []
+}

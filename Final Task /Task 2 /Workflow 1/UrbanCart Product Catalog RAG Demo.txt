@@ -1,0 +1,133 @@
+URBANCART
+PRODUCT CATALOG
+RAG Demonstration Knowledge Document
+
+Document Version: 1.0
+Last Updated: 1 September 2026
+Purpose: Demonstration data for UrbanCart's AI knowledge retrieval system.
+
+1. CATALOG OVERVIEW
+
+This catalog contains demonstration product information for UrbanCart. The information is intended to be used by the AI assistant when answering customer questions about product specifications, prices and availability.
+
+The AI must use the information contained in the current knowledge base. If a requested product or attribute cannot be found, the AI should not invent an answer and should indicate that human assistance may be required.
+
+2. PRODUCTS
+
+Product ID: UC-ELEC-001
+Product: Apple iPhone 15
+Category: Electronics
+Price: Rs. 200,000
+Availability: In Stock
+Key Specifications: 6.1-inch display; 128 GB storage; 48 MP main camera; USB-C; Face ID
+Warranty: 12 months
+
+Product ID: UC-ELEC-002
+Product: Samsung Galaxy S24
+Category: Electronics
+Price: Rs. 189,999
+Availability: In Stock
+Key Specifications: 6.2-inch display; 128 GB storage; 50 MP main camera; 5G; wireless charging
+Warranty: 12 months
+
+Product ID: UC-ELEC-003
+Product: Sony WH-1000XM5
+Category: Accessories
+Price: Rs. 85,000
+Availability: In Stock
+Key Specifications: Wireless over-ear headphones; active noise cancellation; Bluetooth; up to 30 hours battery
+Warranty: 12 months
+
+Product ID: UC-ELEC-004
+Product: Apple AirPods Pro (2nd Gen)
+Category: Accessories
+Price: Rs. 68,000
+Availability: Limited Stock
+Key Specifications: Wireless earbuds; active noise cancellation; USB-C charging case; sweat and water resistance
+Warranty: 12 months
+
+Product ID: UC-HOME-001
+Product: Dyson V8 Vacuum Cleaner
+Category: Home Products
+Price: Rs. 115,000
+Availability: In Stock
+Key Specifications: Cordless vacuum; up to 40 minutes runtime; washable filter; multiple cleaning attachments
+Warranty: 24 months
+
+Product ID: UC-HOME-002
+Product: Philips Air Fryer XL
+Category: Home Products
+Price: Rs. 42,500
+Availability: In Stock
+Key Specifications: Large-capacity air fryer; digital controls; adjustable temperature; timer; removable basket
+Warranty: 12 months
+
+Product ID: UC-LIFE-001
+Product: Apple Watch Series 10
+Category: Lifestyle
+Price: Rs. 125,000
+Availability: Limited Stock
+Key Specifications: Smartwatch; health and fitness tracking; GPS; heart-rate monitoring; water resistance
+Warranty: 12 months
+
+Product ID: UC-LIFE-002
+Product: JBL Flip 6
+Category: Lifestyle
+Price: Rs. 32,000
+Availability: Out of Stock
+Key Specifications: Portable Bluetooth speaker; waterproof design; up to 12 hours battery
+Warranty: 12 months
+
+3. DELIVERY INFORMATION
+
+UrbanCart delivers within Pakistan. Standard delivery times depend on location and the applicable shipping policy. The AI should consult the current shipping-policy document for delivery-time questions rather than relying on assumptions from this catalog.
+
+For a question about whether a particular location is served, the AI should use the current shipping policy. If the required location information is not available, it should not guess.
+
+4. PRODUCT AVAILABILITY RULES
+
+- Products marked In Stock can currently be presented as available.
+- Products marked Limited Stock should be described as having limited availability.
+- Products marked Out of Stock should not be presented as currently available.
+- Availability can change and the AI should use the latest available business data.
+- If the requested product is not present in the catalog, the AI must not invent a product, price or availability status.
+
+5. CUSTOMER QUESTION EXAMPLES
+
+Question: What is the price of the iPhone 15?
+Answer: Rs. 200,000, based on the current catalog.
+
+Question: Is the iPhone 15 available?
+Answer: Yes. It is listed as In Stock.
+
+Question: What storage does the iPhone 15 have?
+Answer: 128 GB.
+
+Question: How much is the Sony WH-1000XM5?
+Answer: Rs. 85,000.
+
+Question: Does the Apple Watch Series 10 have GPS?
+Answer: Yes. GPS is listed in its specifications.
+
+Question: Is the JBL Flip 6 available?
+Answer: No. It is currently listed as Out of Stock.
+
+Question: What is the warranty for the Dyson V8?
+Answer: 24 months.
+
+Question: Do you deliver to Lahore?
+Answer: Use the current UrbanCart shipping policy to answer this; this catalog alone does not establish the complete location-specific delivery rule.
+
+6. RAG USAGE NOTES
+
+This document is intended to be one source in the UrbanCart RAG knowledge base. During implementation, it can be stored in Google Drive, processed into text, split into chunks, embedded and stored in the Supabase vector layer. Customer questions can then retrieve the relevant catalog chunks before the AI generates a response.
+
+Important: This is demonstration catalog data prepared for the assignment. It should not be treated as live commercial inventory. In a production implementation, current product and availability data would be synchronized with UrbanCart's operational system.
+
+7. DOCUMENT CONTROL
+
+Owner: UrbanCart Operations
+Document Type: Product Catalog
+Version: 1.0
+Status: Demonstration / RAG Test Data
+Review Trigger: Product, price, specification, warranty or availability changes.

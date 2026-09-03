@@ -1,0 +1,354 @@
+{
+  "name": "UrbanCart Complaint Escalation",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c670f2f9-fce3-4bc0-a30d-4e2c15066500",
+      "name": "When chat message received",
+      "webhookId": "3d01f2f8-7ce4-48f1-8b88-8a6174684386"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are UrbanCart's customer support assistant.\n\nHandle customer complaints professionally and identify situations that require human support.\n\nEscalate to a human when the customer reports:\n- A damaged or defective product\n- A complicated refund or return issue\n- An angry or highly dissatisfied customer\n- A serious delivery problem\n- Any issue that requires human intervention\n\nFor normal questions that do not require human intervention, respond helpfully.\n\nNever invent information. If you are unsure or cannot resolve the issue, recommend human assistance."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "7c464f45-4a94-495b-926d-6b477bb7f181",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        96,
+        208
+      ],
+      "id": "47d8bef9-499a-41d2-a941-790a53c48bfe",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "jdRaB9ZN3SqfpUOl",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = $json.output || '';\n\nconst lower = output.toLowerCase();\n\nconst escalationKeywords = [\n  'human',\n  'escalat',\n  'damaged',\n  'defective',\n  'refund',\n  'angry',\n  'dissatisfied',\n  'serious delivery'\n];\n\nconst requiresHuman = escalationKeywords.some(keyword =>\n  lower.includes(keyword)\n);\n\nreturn [\n  {\n    json: {\n      ai_response: output,\n      requires_human: requiresHuman\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        592,
+        0
+      ],
+      "id": "55c31219-5ffa-4c30-9b5b-9cbd9822f66a",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "54840ce1-2a9d-4dd8-90ce-5e8a20b7641b",
+              "leftValue": "={{ $json.requires_human }}",
+              "rightValue": "={{ $json.requires_human }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        816,
+        0
+      ],
+      "id": "bd474d30-2c13-48f7-adff-e03a1dbfd810",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0BUAAM1NU9",
+          "mode": "list",
+          "cachedResultName": "urbancart-support"
+        },
+        "text": "=🚨 HIGH PRIORITY URBANCART COMPLAINT\nA customer complaint requires human intervention. \nCustomer Issue:\n{{ $json.ai_response }} \n\nAction Required: Please review this complaint and contact the customer.\nPriority: HIGH",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.7,
+      "position": [
+        1040,
+        -16
+      ],
+      "id": "ed9e801c-003b-4f73-a8a4-c79bfecad2c7",
+      "name": "Send a message",
+      "webhookId": "799f20af-f030-4e3f-bb26-7f16de55a221",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "YtwTkCyMfDWVW0n0",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appCw2iNpEwkcXkS8",
+          "mode": "list",
+          "cachedResultName": "Client Onboarding CRM Base",
+          "cachedResultUrl": "https://airtable.com/appCw2iNpEwkcXkS8"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblIWqSLzD97EmdGU",
+          "mode": "list",
+          "cachedResultName": "UrbanCarts Complaint",
+          "cachedResultUrl": "https://airtable.com/appCw2iNpEwkcXkS8/tblIWqSLzD97EmdGU"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Requires Human": true,
+            "Complaint": "={{ $('When chat message received').item.json.chatInput }}",
+            "Priority": "High",
+            "AI Response": "={{ $('Code in JavaScript').item.json.ai_response }}",
+            "Status": "Open"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Customer Name",
+              "displayName": "Customer Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Complaint",
+              "displayName": "Complaint",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "High",
+                  "value": "High"
+                },
+                {
+                  "name": "Medium",
+                  "value": "Medium"
+                },
+                {
+                  "name": "Low",
+                  "value": "Low"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Requires Human",
+              "displayName": "Requires Human",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "AI Response",
+              "displayName": "AI Response",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Open",
+                  "value": "Open"
+                },
+                {
+                  "name": "In Progress",
+                  "value": "In Progress"
+                },
+                {
+                  "name": "Resolved",
+                  "value": "Resolved"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1264,
+        -16
+      ],
+      "id": "ccb62ae6-3479-4290-91ed-ecf5f58a5ceb",
+      "name": "Create a record",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "ovCPS0u2qsMiIypX",
+          "name": "Airtable account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Create a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "b6f014c7-d968-492b-8985-8888044578d6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ebbf39d0764128079d716133dd1fa61dec8e9c491bec9f0adbe7c4bd51fa41cd"
+  },
+  "nodeGroups": [],
+  "id": "xCVxnzZQbvM0CT1O",
+  "tags": []
+}
